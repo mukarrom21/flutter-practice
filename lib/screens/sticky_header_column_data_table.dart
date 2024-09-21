@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:linked_scroll_controller/linked_scroll_controller.dart';
 
-
 class StickyHeaderColumnDataTable extends StatefulWidget {
   const StickyHeaderColumnDataTable({super.key});
 
   @override
-  State<StickyHeaderColumnDataTable> createState() => _StickyHeaderColumnDataTableState();
+  State<StickyHeaderColumnDataTable> createState() =>
+      _StickyHeaderColumnDataTableState();
 }
 
-class _StickyHeaderColumnDataTableState extends State<StickyHeaderColumnDataTable> {
-
-  LinkedScrollControllerGroup linkedScrollControllerGroup = LinkedScrollControllerGroup();
+class _StickyHeaderColumnDataTableState
+    extends State<StickyHeaderColumnDataTable> {
+  LinkedScrollControllerGroup linkedScrollControllerGroup =
+      LinkedScrollControllerGroup();
 
   ScrollController? headerScrollController;
   ScrollController? dataScrollController;
@@ -39,7 +40,7 @@ class _StickyHeaderColumnDataTableState extends State<StickyHeaderColumnDataTabl
             child: Row(children: [
               DataTable(
                 columns:
-                TableColumnHelper.tableColumnsList.getRange(0, 1).map((e) {
+                    TableColumnHelper.tableColumnsList.getRange(0, 1).map((e) {
                   return DataColumn(
                     label: SizedBox(
                       width: e.width,
@@ -51,7 +52,7 @@ class _StickyHeaderColumnDataTableState extends State<StickyHeaderColumnDataTabl
                 dataRowColor: WidgetStateProperty.all(Colors.green.shade100),
                 rows: List.generate(
                   100,
-                      (index) {
+                  (index) {
                     return DataRow(cells: [
                       DataCell(Text('$index')),
                     ]);
@@ -65,7 +66,7 @@ class _StickyHeaderColumnDataTableState extends State<StickyHeaderColumnDataTabl
                   child: DataTable(
                     columns: TableColumnHelper.tableColumnsList
                         .getRange(
-                        1, TableColumnHelper.tableColumnsList.length - 1)
+                            1, TableColumnHelper.tableColumnsList.length - 1)
                         .map((e) {
                       return DataColumn(
                         label: SizedBox(
@@ -103,10 +104,11 @@ class _StickyHeaderColumnDataTableState extends State<StickyHeaderColumnDataTabl
                   );
                 }).toList(),
                 headingRowColor: WidgetStateProperty.all(Colors.greenAccent),
-                dataRowColor: WidgetStatePropertyAll(Colors.greenAccent.shade100),
+                dataRowColor:
+                    WidgetStatePropertyAll(Colors.greenAccent.shade100),
                 rows: List.generate(
                   100,
-                      (index) {
+                  (index) {
                     return DataRow(cells: [
                       DataCell(Row(
                         children: [
@@ -144,12 +146,12 @@ class _StickyHeaderColumnDataTableState extends State<StickyHeaderColumnDataTabl
         columns: TableColumnHelper.tableColumnsList.getRange(0, 1).map((e) {
           return DataColumn(
               label: SizedBox(
-                width: e.width,
-                child: Text(e.title ?? ""),
-              ));
+            width: e.width,
+            child: Text(e.title ?? ""),
+          ));
         }).toList(),
         headingRowColor: WidgetStateProperty.all(Colors.green),
-        rows: [],
+        rows: const [],
       ),
       Expanded(
         child: SingleChildScrollView(
@@ -167,7 +169,7 @@ class _StickyHeaderColumnDataTableState extends State<StickyHeaderColumnDataTabl
               );
             }).toList(),
             headingRowColor: const WidgetStatePropertyAll(Colors.teal),
-            rows: [],
+            rows: const [],
           ),
         ),
       ),
@@ -186,7 +188,7 @@ class _StickyHeaderColumnDataTableState extends State<StickyHeaderColumnDataTabl
           );
         }).toList(),
         headingRowColor: WidgetStateProperty.all(Colors.greenAccent),
-        rows: [],
+        rows: const [],
       ),
     ]);
   }
