@@ -1,5 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:practice_with_ostad/ui/screens/main_screen.dart';
 import 'package:practice_with_ostad/ui/screens/signup_screen.dart';
 import 'package:practice_with_ostad/ui/screens/verify_email_screen.dart';
 import 'package:practice_with_ostad/ui/utils/app_colors.dart';
@@ -54,6 +55,7 @@ class _SignInScreenState extends State<SignInScreen> {
       ),
     );
   }
+
   /// Build the sign in form
   Widget _buildSignInForm() {
     return Form(
@@ -112,7 +114,8 @@ class _SignInScreenState extends State<SignInScreen> {
                   style: textTheme.bodyLarge?.copyWith(
                     color: AppColors.themeColor,
                   ),
-                  recognizer: TapGestureRecognizer()..onTap = _onClickDontHaveAccountSignup,
+                  recognizer: TapGestureRecognizer()
+                    ..onTap = _onClickDontHaveAccountSignup,
                 ),
               ],
             ),
@@ -123,11 +126,16 @@ class _SignInScreenState extends State<SignInScreen> {
   }
 
   void _onClickNextArrowButton() {
-    /// TODO: Implement sign in
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (context) => const MainScreen()),
+      (route) => false,
+    );
   }
 
   void _onClickForgotPassword() {
-    Navigator.push(context, MaterialPageRoute(builder: (context) => const VerifyEmailScreen()));
+    Navigator.push(context,
+        MaterialPageRoute(builder: (context) => const VerifyEmailScreen()));
   }
 
   void _onClickDontHaveAccountSignup() {
