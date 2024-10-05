@@ -34,13 +34,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
-    const String background = 'assets/images/background.svg';
-    const String logo = 'assets/images/logo.svg';
-    Size size = MediaQuery.of(context).size;
     return Scaffold(
-      // appBar: AppBar(
-      //   backgroundColor: Colors.blue,
-      // ),
       body: BackgroundScreen(
         child: Center(
           child: SvgPicture.asset(

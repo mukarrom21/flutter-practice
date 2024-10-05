@@ -6,7 +6,7 @@ import 'package:practice_with_ostad/ui/screens/new_task_screen.dart';
 import 'package:practice_with_ostad/ui/screens/progress_task_screen.dart';
 import 'package:practice_with_ostad/ui/utils/app_colors.dart';
 
-import 'app_bar_header.dart';
+import '../widgets/app_bar_header.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
