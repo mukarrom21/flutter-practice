@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:practice_with_ostad/ui/screens/task_card.dart';
 import 'package:practice_with_ostad/ui/screens/task_summary_card.dart';
 
-import '../utils/app_colors.dart';
-
 class NewTaskScreen extends StatelessWidget {
   const NewTaskScreen({super.key});
 
@@ -23,11 +21,12 @@ class NewTaskScreen extends StatelessWidget {
                 itemCount: 50,
                 itemBuilder: (context, index) {
                   return const TaskCard();
-                }, separatorBuilder: (BuildContext context, int index) {
-                return const SizedBox(
-                  height: 8,
-                );
-              },
+                },
+                separatorBuilder: (BuildContext context, int index) {
+                  return const SizedBox(
+                    height: 8,
+                  );
+                },
               ),
             ),
           ],
@@ -62,4 +61,3 @@ class NewTaskScreen extends StatelessWidget {
     );
   }
 }
-

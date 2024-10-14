@@ -10,33 +10,30 @@ class TaskManagerApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        colorSchemeSeed: AppColors.themeColor,
-        inputDecorationTheme: _inputDecorationTheme(),
-        elevatedButtonTheme: _elevatedButtonThemeData()
-      ),
+          colorSchemeSeed: AppColors.themeColor,
+          inputDecorationTheme: _inputDecorationTheme(),
+          elevatedButtonTheme: _elevatedButtonThemeData()),
       home: const SplashScreen(),
     );
   }
 
   ElevatedButtonThemeData _elevatedButtonThemeData() {
     return ElevatedButtonThemeData(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.themeColor,
-          foregroundColor: Colors.white,
-          padding: const EdgeInsets.symmetric(vertical: 10),
-          fixedSize: const Size.fromWidth(double.maxFinite),
-          shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.circular(8)),
-          ),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: AppColors.themeColor,
+        foregroundColor: Colors.white,
+        padding: const EdgeInsets.symmetric(vertical: 10),
+        fixedSize: const Size.fromWidth(double.maxFinite),
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(8)),
         ),
-      );
+      ),
+    );
   }
 
   InputDecorationTheme _inputDecorationTheme() {
     return InputDecorationTheme(
-      hintStyle: const TextStyle(
-        color: Colors.grey
-      ),
+      hintStyle: const TextStyle(color: Colors.grey),
       fillColor: Colors.white,
       filled: true,
       border: _inputBorder(),

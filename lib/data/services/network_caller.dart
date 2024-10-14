@@ -29,17 +29,21 @@ class NetworkCaller {
   }
 
   /// HTTP Post Request
-  static Future<NetworkResponse> postRequest(
-      String url, Map<String, dynamic>? data) async {
+  static Future<NetworkResponse> postRequest({
+    required String url,
+    Map<String, dynamic>? data,
+  }) async {
     try {
       Uri uri = Uri.parse(url);
-      final Response response = await post(
+
+      Response response = await post(
         uri,
         headers: {
           'Content-Type': "application/json",
         },
-        body: data,
+        body: jsonEncode(data),
       );
+
       printResponse(url, response);
       if (response.statusCode == 200) {
         final decodeData = jsonDecode(response.body);
