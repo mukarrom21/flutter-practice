@@ -1,59 +1,139 @@
 import 'package:flutter/material.dart';
+import 'package:practice_with_ostad/data/models/network_response.dart';
+import 'package:practice_with_ostad/data/services/network_caller.dart';
+import 'package:practice_with_ostad/data/utils/urls.dart';
 import 'package:practice_with_ostad/ui/widgets/app_bar_header.dart';
+import 'package:practice_with_ostad/ui/widgets/snack_bar_message.dart';
 
-class AddNewTask extends StatelessWidget {
+class AddNewTask extends StatefulWidget {
   const AddNewTask({super.key});
 
   @override
+  State<AddNewTask> createState() => _AddNewTaskState();
+}
+
+class _AddNewTaskState extends State<AddNewTask> {
+  final TextEditingController _titleTEController = TextEditingController();
+  final TextEditingController _descriptionTEController =
+      TextEditingController();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  bool _isLoading = false;
+
+  @override
   Widget build(BuildContext context) {
-    // var a = "a";
-    // /// check type of a
-    // print(a.runtimeType);
     return Scaffold(
       appBar: const AppBarHeader(),
       body: Padding(
         padding: const EdgeInsets.all(24.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(
-              height: 40,
-            ),
-            Text(
-              "Add New Task",
-              style: Theme.of(context)
-                  .textTheme
-                  .headlineSmall
-                  ?.copyWith(fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(
-              height: 12,
-            ),
-            TextFormField(
-              decoration: const InputDecoration(
-                hintText: 'Title',
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(
+                height: 40,
               ),
-            ),
-            const SizedBox(
-              height: 12,
-            ),
-            TextFormField(
-              keyboardType: TextInputType.multiline,
-              maxLines: 5,
-              decoration: const InputDecoration(
-                hintText: 'Description',
+              Text(
+                "Add New Task",
+                style: Theme.of(context)
+                    .textTheme
+                    .headlineSmall
+                    ?.copyWith(fontWeight: FontWeight.bold),
               ),
-            ),
-            const SizedBox(
-              height: 12,
-            ),
-            ElevatedButton(
-              onPressed: () {},
-              child: const Icon(Icons.arrow_circle_right_outlined),
-            ),
-          ],
+              const SizedBox(
+                height: 12,
+              ),
+
+              /// title form field
+              TextFormField(
+                controller: _titleTEController,
+                validator: (value) {
+                  if (value?.isEmpty ?? true) {
+                    return "Please add title";
+                  }
+                  return null;
+                },
+                decoration: const InputDecoration(
+                  hintText: 'Title',
+                ),
+              ),
+              const SizedBox(
+                height: 12,
+              ),
+
+              /// description form field
+              TextFormField(
+                controller: _descriptionTEController,
+                validator: (value) {
+                  if (value?.isEmpty ?? true) {
+                    return "Please add Description";
+                  }
+                  return null;
+                },
+                keyboardType: TextInputType.multiline,
+                maxLines: 5,
+                decoration: const InputDecoration(
+                  hintText: 'Description',
+                ),
+              ),
+              const SizedBox(
+                height: 12,
+              ),
+              Visibility(
+                visible: !_isLoading,
+                replacement: const Center(
+                  child: CircularProgressIndicator(),
+                ),
+                child: ElevatedButton(
+                  onPressed: _onPressedSubmitButton,
+                  child: const Icon(Icons.arrow_circle_right_outlined),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
+  }
+
+  void _onPressedSubmitButton() {
+    if (_formKey.currentState!.validate()) {
+      _addNewTask();
+    }
+  }
+
+  Future<void> _addNewTask() async {
+    _isLoading = true;
+    setState(() {});
+    Map<String, dynamic> requestBody = {
+      "title": _titleTEController.text.trim(),
+      "description": _descriptionTEController.text,
+      "status": "New"
+    };
+    NetworkResponse response = await NetworkCaller.postRequest(
+      url: Urls.addNewTask,
+      data: requestBody,
+    );
+    _isLoading = false;
+    if (response.isSuccess) {
+      showSnackBarMessage(context, "New task added successfully");
+      _clearTextField();
+    } else {
+      showSnackBarMessage(context, response.errorMessage, true);
+    }
+    setState(() {});
+  }
+
+  void _clearTextField(){
+    _titleTEController.clear();
+    _descriptionTEController.clear();
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    _titleTEController.dispose();
+    _descriptionTEController.dispose();
   }
 }

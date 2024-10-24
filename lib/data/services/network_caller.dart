@@ -2,21 +2,26 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
+import 'package:practice_with_ostad/app.dart';
 import 'package:practice_with_ostad/data/models/network_response.dart';
+import 'package:practice_with_ostad/ui/controller/auth_controller.dart';
+import 'package:practice_with_ostad/ui/screens/sign_in_screen.dart';
 
 class NetworkCaller {
   /// HTTP Get Request
   static Future<NetworkResponse> getRequest(String url) async {
     try {
       Uri uri = Uri.parse(url);
-      final Response response = await get(uri);
+      final Response response = await get(uri, headers: {
+        'token': AuthController.accessToken.toString(),
+      });
       printResponse(url, response);
       if (response.statusCode == 200) {
         final decodeData = await jsonDecode(response.body);
         return NetworkResponse(
           isSuccess: true,
           statusCode: response.statusCode,
-          response: decodeData,
+          responseData: decodeData,
         );
       } else {
         return NetworkResponse(
@@ -40,6 +45,7 @@ class NetworkCaller {
         uri,
         headers: {
           'Content-Type': "application/json",
+          'token': AuthController.accessToken.toString(),
         },
         body: jsonEncode(data),
       );
@@ -50,7 +56,14 @@ class NetworkCaller {
         return NetworkResponse(
           isSuccess: true,
           statusCode: response.statusCode,
-          response: decodeData,
+          responseData: decodeData,
+        );
+      } else if (response.statusCode == 401) {
+        _moveToLogin();
+        return NetworkResponse(
+          isSuccess: false,
+          statusCode: response.statusCode,
+          errorMessage: "Unauthorized",
         );
       } else {
         return NetworkResponse(
@@ -70,6 +83,15 @@ class NetworkCaller {
   static void printResponse(String url, Response response) {
     debugPrint(
       'URL: $url \nRESPONSE CODE: ${response.statusCode} \nRESPONSE: ${response.body}',
+    );
+  }
+
+  static Future<void> _moveToLogin() async {
+    await AuthController.clearUserData();
+    Navigator.pushAndRemoveUntil(
+      TaskManagerApp.navigationKey.currentContext!,
+      MaterialPageRoute(builder: (context) => const SignInScreen()),
+      (_) => false,
     );
   }
 }

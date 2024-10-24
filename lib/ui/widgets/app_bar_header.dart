@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:practice_with_ostad/ui/controller/auth_controller.dart';
 import 'package:practice_with_ostad/ui/screens/profile_screen.dart';
+import 'package:practice_with_ostad/ui/screens/sign_in_screen.dart';
 import '../utils/app_colors.dart';
 
 class AppBarHeader extends StatelessWidget implements PreferredSizeWidget {
   const AppBarHeader({
-    super.key, this.isProfileScreen = false,
+    super.key,
+    this.isProfileScreen = false,
   });
 
   final bool isProfileScreen;
@@ -14,7 +17,8 @@ class AppBarHeader extends StatelessWidget implements PreferredSizeWidget {
     return GestureDetector(
       onTap: () {
         if (isProfileScreen) return;
-        Navigator.push(context, MaterialPageRoute(builder: (context) => const ProfileScreen()));
+        Navigator.push(context,
+            MaterialPageRoute(builder: (context) => const ProfileScreen()));
       },
       child: AppBar(
         backgroundColor: AppColors.themeColor,
@@ -49,6 +53,23 @@ class AppBarHeader extends StatelessWidget implements PreferredSizeWidget {
             ),
           ],
         ),
+        actions: [
+          IconButton(
+              onPressed: () async {
+                /// Clear access token
+                await AuthController.clearUserData();
+
+                /// Navigate to sign in screen
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const SignInScreen(),
+                  ),
+                  (Route<dynamic> route) => false,
+                );
+              },
+              icon: const Icon(Icons.logout_outlined)),
+        ],
       ),
     );
   }

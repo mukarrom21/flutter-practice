@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:practice_with_ostad/data/models/task_model.dart';
 
 import '../utils/app_colors.dart';
 
 class TaskCard extends StatelessWidget {
-  const TaskCard({super.key});
+  const TaskCard({super.key, this.task});
+  final TaskModel? task;
 
   @override
   Widget build(BuildContext context) {
@@ -17,16 +19,16 @@ class TaskCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'New Task',
-                style: TextStyle(
+              Text(
+                task?.title ?? "title",
+                style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 18,
                 ),
               ),
-              const Text(
-                  'Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet. '),
-              const Text("26/10/2022"),
+              Text(
+                  task?.description ?? 'Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet. '),
+              Text(task?.createdDate ?? "26/10/2022"),
               Row(
                 children: [
                   const Chip(

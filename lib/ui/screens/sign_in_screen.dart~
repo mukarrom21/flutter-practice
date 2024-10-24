@@ -167,46 +167,46 @@ class _SignInScreenState extends State<SignInScreen> {
       return;
     }
 
-    _signUp();
+    // _signUp();
   }
 
-  Future<void> _signUp() async {
-    setState(() {
-      _isLoading = true;
-    });
-
-    Map<String, dynamic> requestBody = {
-      "email": _emailController.text.trim(),
-      "password": _passwordController.text,
-    };
-
-    final NetworkResponse response = await NetworkCaller.postRequest(
-      url: Urls.login,
-      data: requestBody,
-    );
-
-    setState(() {
-      _isLoading = false;
-    });
-
-    if (response.isSuccess) {
-      /// save access token
-      await AuthController.saveAccessToken(response.responseData['token']);
-
-      if (mounted) {
-        Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(builder: (context) => const MainScreen()),
-          (route) => false,
-        );
-        showSnackBarMessage(context, "Login completed successfully", false);
-      }
-    } else {
-      if (mounted) {
-        showSnackBarMessage(context, response.errorMessage, true);
-      }
-    }
-  }
+  // Future<void> _signUp() async {
+  //   setState(() {
+  //     _isLoading = true;
+  //   });
+  //
+  //   Map<String, dynamic> requestBody = {
+  //     "email": _emailController.text.trim(),
+  //     "password": _passwordController.text,
+  //   };
+  //
+  //   final NetworkResponse response = await NetworkCaller.postRequest(
+  //     url: Urls.login,
+  //     data: requestBody,
+  //   );
+  //
+  //   setState(() {
+  //     _isLoading = false;
+  //   });
+  //
+  //   if (response.isSuccess) {
+  //     /// save access token
+  //     await AuthController.saveAccessToken(response.responseData['token']);
+  //
+  //     if (mounted) {
+  //       Navigator.pushAndRemoveUntil(
+  //         context,
+  //         MaterialPageRoute(builder: (context) => const MainScreen()),
+  //         (route) => false,
+  //       );
+  //       showSnackBarMessage(context, "Login completed successfully", false);
+  //     }
+  //   } else {
+  //     if (mounted) {
+  //       showSnackBarMessage(context, response.errorMessage, true);
+  //     }
+  //   }
+  // }
 
   void _onClickForgotPassword() {
     Navigator.push(context,

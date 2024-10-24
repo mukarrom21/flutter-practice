@@ -4,7 +4,6 @@ import 'package:practice_with_ostad/ui/screens/cancelled_task_screen.dart';
 import 'package:practice_with_ostad/ui/screens/completed_task_screen.dart';
 import 'package:practice_with_ostad/ui/screens/new_task_screen.dart';
 import 'package:practice_with_ostad/ui/screens/progress_task_screen.dart';
-import 'package:practice_with_ostad/ui/utils/app_colors.dart';
 
 import '../widgets/app_bar_header.dart';
 
@@ -23,6 +22,7 @@ class _MainScreenState extends State<MainScreen> {
     const CancelledTaskScreen(),
     const ProgressTaskScreen(),
   ];
+
 
   @override
   Widget build(BuildContext context) {
