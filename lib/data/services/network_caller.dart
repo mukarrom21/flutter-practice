@@ -23,6 +23,13 @@ class NetworkCaller {
           statusCode: response.statusCode,
           responseData: decodeData,
         );
+      } else if (response.statusCode == 401) {
+        _moveToLogin();
+        return NetworkResponse(
+          isSuccess: false,
+          statusCode: response.statusCode,
+          errorMessage: "Unauthorized",
+        );
       } else {
         return NetworkResponse(
             isSuccess: false, statusCode: response.statusCode);

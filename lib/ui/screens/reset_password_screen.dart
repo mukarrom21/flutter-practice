@@ -1,6 +1,5 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:practice_with_ostad/ui/screens/sign_in_screen.dart';
 import 'package:practice_with_ostad/ui/utils/app_colors.dart';
 import 'package:practice_with_ostad/ui/widgets/background_screen.dart';
@@ -111,7 +110,8 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
               style: textTheme.bodyLarge?.copyWith(
                 color: AppColors.themeColor,
               ),
-              recognizer: TapGestureRecognizer()..onTap = _onClickHaveAccountSignIn,
+              recognizer: TapGestureRecognizer()
+                ..onTap = _onClickHaveAccountSignIn,
             ),
           ],
         ),

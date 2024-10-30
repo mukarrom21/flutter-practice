@@ -4,6 +4,7 @@ import 'package:practice_with_ostad/data/models/task_list_model.dart';
 import 'package:practice_with_ostad/data/models/task_model.dart';
 import 'package:practice_with_ostad/data/services/network_caller.dart';
 import 'package:practice_with_ostad/data/utils/urls.dart';
+import 'package:practice_with_ostad/ui/screens/add_new_task.dart';
 import 'package:practice_with_ostad/ui/screens/task_card.dart';
 import 'package:practice_with_ostad/ui/screens/task_summary_card.dart';
 import 'package:practice_with_ostad/ui/widgets/center_circuler_progress_indicator.dart';
@@ -20,7 +21,7 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
   List<TaskModel> _newTaskList = [];
   bool _getNewTaskInProgress = false;
 
-  Future<void> _getNewTasks() async {
+  Future<void> _getNewTasksList() async {
     _newTaskList.clear();
     _getNewTaskInProgress = true;
     setState(() {});
@@ -40,17 +41,20 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
 
   @override
   void initState() {
-    // TODO: implement initState
-    _getNewTasks();
+    _getNewTasksList();
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => _onPressedFAB(),
+        child: const Icon(Icons.add),
+      ),
       body: RefreshIndicator(
         onRefresh: () async {
-          _getNewTasks();
+          _getNewTasksList();
         },
         child: Padding(
           padding: const EdgeInsets.all(8.0),
@@ -110,5 +114,16 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
         ],
       ),
     );
+  }
+
+  /// On Pressed FAB
+  _onPressedFAB() async {
+    final bool? shouldRefresh = await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const AddNewTask()),
+    );
+    if (shouldRefresh == true) {
+      _getNewTasksList();
+    }
   }
 }

@@ -18,78 +18,88 @@ class _AddNewTaskState extends State<AddNewTask> {
       TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   bool _isLoading = false;
+  bool _shouldRefreshPreviousPage = false;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: const AppBarHeader(),
-      body: Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(
-                height: 40,
-              ),
-              Text(
-                "Add New Task",
-                style: Theme.of(context)
-                    .textTheme
-                    .headlineSmall
-                    ?.copyWith(fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(
-                height: 12,
-              ),
+      body: PopScope(
+        canPop: false,
+        onPopInvokedWithResult: (didPop, result) {
+          if (didPop) {
+            return;
+          }
+          Navigator.pop(context, _shouldRefreshPreviousPage);
+        },
+        child: Padding(
+          padding: const EdgeInsets.all(24.0),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(
+                  height: 40,
+                ),
+                Text(
+                  "Add New Task",
+                  style: Theme.of(context)
+                      .textTheme
+                      .headlineSmall
+                      ?.copyWith(fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(
+                  height: 12,
+                ),
 
-              /// title form field
-              TextFormField(
-                controller: _titleTEController,
-                validator: (value) {
-                  if (value?.isEmpty ?? true) {
-                    return "Please add title";
-                  }
-                  return null;
-                },
-                decoration: const InputDecoration(
-                  hintText: 'Title',
+                /// title form field
+                TextFormField(
+                  controller: _titleTEController,
+                  validator: (value) {
+                    if (value?.isEmpty ?? true) {
+                      return "Please add title";
+                    }
+                    return null;
+                  },
+                  decoration: const InputDecoration(
+                    hintText: 'Title',
+                  ),
                 ),
-              ),
-              const SizedBox(
-                height: 12,
-              ),
+                const SizedBox(
+                  height: 12,
+                ),
 
-              /// description form field
-              TextFormField(
-                controller: _descriptionTEController,
-                validator: (value) {
-                  if (value?.isEmpty ?? true) {
-                    return "Please add Description";
-                  }
-                  return null;
-                },
-                keyboardType: TextInputType.multiline,
-                maxLines: 5,
-                decoration: const InputDecoration(
-                  hintText: 'Description',
+                /// description form field
+                TextFormField(
+                  controller: _descriptionTEController,
+                  validator: (value) {
+                    if (value?.isEmpty ?? true) {
+                      return "Please add Description";
+                    }
+                    return null;
+                  },
+                  keyboardType: TextInputType.multiline,
+                  maxLines: 5,
+                  decoration: const InputDecoration(
+                    hintText: 'Description',
+                  ),
                 ),
-              ),
-              const SizedBox(
-                height: 12,
-              ),
-              Visibility(
-                visible: !_isLoading,
-                replacement: const Center(
-                  child: CircularProgressIndicator(),
+                const SizedBox(
+                  height: 12,
                 ),
-                child: ElevatedButton(
-                  onPressed: _onPressedSubmitButton,
-                  child: const Icon(Icons.arrow_circle_right_outlined),
+                Visibility(
+                  visible: !_isLoading,
+                  replacement: const Center(
+                    child: CircularProgressIndicator(),
+                  ),
+                  child: ElevatedButton(
+                    onPressed: _onPressedSubmitButton,
+                    child: const Icon(Icons.arrow_circle_right_outlined),
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -115,23 +125,23 @@ class _AddNewTaskState extends State<AddNewTask> {
       data: requestBody,
     );
     _isLoading = false;
+    setState(() {});
     if (response.isSuccess) {
+      _shouldRefreshPreviousPage = true;
       showSnackBarMessage(context, "New task added successfully");
       _clearTextField();
     } else {
       showSnackBarMessage(context, response.errorMessage, true);
     }
-    setState(() {});
   }
 
-  void _clearTextField(){
+  void _clearTextField() {
     _titleTEController.clear();
     _descriptionTEController.clear();
   }
 
   @override
   void dispose() {
-    // TODO: implement dispose
     super.dispose();
     _titleTEController.dispose();
     _descriptionTEController.dispose();

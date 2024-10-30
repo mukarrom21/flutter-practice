@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:practice_with_ostad/ui/screens/add_new_task.dart';
 import 'package:practice_with_ostad/ui/screens/cancelled_task_screen.dart';
 import 'package:practice_with_ostad/ui/screens/completed_task_screen.dart';
 import 'package:practice_with_ostad/ui/screens/new_task_screen.dart';
@@ -23,17 +22,12 @@ class _MainScreenState extends State<MainScreen> {
     const ProgressTaskScreen(),
   ];
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: const AppBarHeader(),
       bottomNavigationBar: _buildNavigationBar(),
       body: _screens[_selectedIndex],
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => _onPressedFAB(),
-        child: const Icon(Icons.add),
-      ),
     );
   }
 
@@ -57,10 +51,4 @@ class _MainScreenState extends State<MainScreen> {
       },
     );
   }
-
-  _onPressedFAB() {
-    Navigator.push(
-        context, MaterialPageRoute(builder: (context) => const AddNewTask()));
-  } // _buildNavigationBar
-  /// ->
 } // This is last curly brace
