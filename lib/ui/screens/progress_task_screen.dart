@@ -19,7 +19,7 @@ class _ProgressTaskScreenState extends State<ProgressTaskScreen> {
   List<TaskModel> _completedTaskList = [];
   bool _getCompletedTaskInProgress = false;
 
-  Future<void> _getCompletedTasks() async {
+  Future<void> _getProgressTasks() async {
     _completedTaskList.clear();
     _getCompletedTaskInProgress = true;
     setState(() {});
@@ -29,7 +29,6 @@ class _ProgressTaskScreenState extends State<ProgressTaskScreen> {
       final TaskListModel taskListModel =
           TaskListModel.fromJson(response.responseData);
       _completedTaskList = taskListModel.taskList ?? [];
-      showSnackBarMessage(context, "Progress task retrieved successfully");
     } else {
       showSnackBarMessage(context, response.errorMessage, true);
     }
@@ -40,7 +39,7 @@ class _ProgressTaskScreenState extends State<ProgressTaskScreen> {
   @override
   void initState() {
     // TODO: implement initState
-    _getCompletedTasks();
+    _getProgressTasks();
     super.initState();
   }
 
@@ -54,7 +53,7 @@ class _ProgressTaskScreenState extends State<ProgressTaskScreen> {
         child: ListView.separated(
           itemCount: _completedTaskList.length,
           itemBuilder: (context, index) {
-            return TaskCard(task: _completedTaskList[index],);
+            return TaskCard(task: _completedTaskList[index], getTaskList: _getProgressTasks,);
           },
           separatorBuilder: (BuildContext context, int index) {
             return const SizedBox(

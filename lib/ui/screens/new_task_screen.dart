@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:practice_with_ostad/data/models/network_response.dart';
 import 'package:practice_with_ostad/data/models/task_list_model.dart';
 import 'package:practice_with_ostad/data/models/task_model.dart';
+import 'package:practice_with_ostad/data/models/task_status_count.dart';
+import 'package:practice_with_ostad/data/models/task_status_count_list.dart';
 import 'package:practice_with_ostad/data/services/network_caller.dart';
 import 'package:practice_with_ostad/data/utils/urls.dart';
 import 'package:practice_with_ostad/ui/screens/add_new_task.dart';
@@ -19,6 +21,7 @@ class NewTaskScreen extends StatefulWidget {
 
 class _NewTaskScreenState extends State<NewTaskScreen> {
   List<TaskModel> _newTaskList = [];
+  List<TaskStatusCount> _taskStatusCountList = [];
   bool _getNewTaskInProgress = false;
 
   Future<void> _getNewTasksList() async {
@@ -39,8 +42,24 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
     setState(() {});
   }
 
+  Future<void> _getTaskSummary() async {
+    final NetworkResponse response =
+        await NetworkCaller.getRequest(Urls.taskStatusCount);
+    if (response.isSuccess) {
+      final TaskStatusCountList taskStatusCountList =
+          TaskStatusCountList.fromJson(response.responseData);
+      _taskStatusCountList = taskStatusCountList.taskStatusCountList ?? [];
+      // showSnackBarMessage(context, "New task retrieved successfully");
+    } else {
+      showSnackBarMessage(context, response.errorMessage, true);
+    }
+    _getNewTaskInProgress = false;
+    setState(() {});
+  }
+
   @override
   void initState() {
+    _getTaskSummary();
     _getNewTasksList();
     super.initState();
   }
@@ -73,6 +92,7 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
                     itemBuilder: (context, index) {
                       return TaskCard(
                         task: _newTaskList[index],
+                        getTaskList: _getNewTasksList,
                       );
                     },
                     separatorBuilder: (BuildContext context, int index) {
@@ -91,27 +111,21 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
   }
 
   Widget _taskSummary() {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        children: [
-          TaskSummaryCard(
-            title: 'New',
-            count: _newTaskList.length,
-          ),
-          const TaskSummaryCard(
-            title: 'Completed',
-            count: 10,
-          ),
-          const TaskSummaryCard(
-            title: 'Cancelled',
-            count: 10,
-          ),
-          const TaskSummaryCard(
-            title: 'Progress',
-            count: 10,
-          ),
-        ],
+    return Visibility(
+      visible: _getNewTaskInProgress == false,
+      replacement: const CenterCircularProgressIndicator(),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: _taskStatusCountList
+              .map(
+                (e) => TaskSummaryCard(
+                  title: e.sId ?? "",
+                  count: e.sum ?? 0,
+                ),
+              )
+              .toList(),
+        ),
       ),
     );
   }

@@ -1,12 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:practice_with_ostad/data/models/network_response.dart';
 import 'package:practice_with_ostad/data/models/task_model.dart';
+import 'package:practice_with_ostad/ui/widgets/snack_bar_message.dart';
 
+import '../../data/services/network_caller.dart';
+import '../../data/utils/urls.dart';
 import '../utils/app_colors.dart';
 
-class TaskCard extends StatelessWidget {
-  const TaskCard({super.key, this.task});
-  final TaskModel? task;
+class TaskCard extends StatefulWidget {
+  const TaskCard({super.key, this.task, required this.getTaskList});
 
+  final TaskModel? task;
+  final Function() getTaskList;
+
+  @override
+  State<TaskCard> createState() => _TaskCardState();
+}
+
+class _TaskCardState extends State<TaskCard> {
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -20,43 +31,32 @@ class TaskCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                task?.title ?? "title",
+                widget.task?.title ?? "title",
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 18,
                 ),
               ),
-              Text(
-                  task?.description ?? 'Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet. '),
-              Text(task?.createdDate ?? "26/10/2022"),
+              Text(widget.task?.description ??
+                  'Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet. '),
+              Text(widget.task?.createdDate ?? "26/10/2022"),
               Row(
                 children: [
-                  const Chip(
-                    label: Text('New', style: TextStyle(
-                      color: AppColors.themeColor,
-                    ),),
-                    color: WidgetStatePropertyAll(Colors.white),
-                    side: BorderSide(
-                      color: AppColors.themeColor,
-                      width: 1,
-                    ),
-                    shape: StadiumBorder(
-                      side: BorderSide(
-                        color: AppColors.themeColor,
-                        width: 1,
-                      ),
-                    ),
-                  ),
+                  _buildStatusChip(),
                   const Spacer(),
+
+                  /// Edit Button
                   IconButton(
-                    onPressed: () {},
+                    onPressed: _onPressedEditButton,
                     icon: const Icon(
                       Icons.edit,
                       color: AppColors.themeColor,
                     ),
                   ),
+
+                  /// Delete Button
                   IconButton(
-                    onPressed: () {},
+                    onPressed: _onPressedDeleteButton,
                     icon: const Icon(
                       Icons.delete,
                       color: Colors.red,
@@ -69,5 +69,78 @@ class TaskCard extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Widget _buildStatusChip() {
+    return Chip(
+      label: Text(
+        widget.task?.status ?? "New",
+        style: const TextStyle(
+          color: AppColors.themeColor,
+        ),
+      ),
+      color: const WidgetStatePropertyAll(Colors.white),
+      side: const BorderSide(
+        color: AppColors.themeColor,
+        width: 1,
+      ),
+      shape: const StadiumBorder(
+        side: BorderSide(
+          color: AppColors.themeColor,
+          width: 1,
+        ),
+      ),
+    );
+  }
+
+  void _onPressedEditButton() {
+    showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+              title: const Text("Edit Task Status"),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: ["New", "Completed", "Cancelled", "Progress"]
+                    .map(
+                      (e) => ListTile(
+                        tileColor:
+                            widget.task?.status == e ? Colors.grey : null,
+                        title: Text(e),
+                        onTap: () {
+                          _onTapChangeStatus(e);
+                          Navigator.pop(context);
+                        },
+                        selected: widget.task?.status == e ? true : false,
+                        selectedColor: AppColors.themeColor,
+                        trailing: widget.task?.status == e
+                            ? const Icon(Icons.check)
+                            : null,
+                      ),
+                    )
+                    .toList(),
+              ),
+            ));
+  }
+
+  Future<void> _onTapChangeStatus(String e) async {
+    NetworkResponse response = await NetworkCaller.getRequest(
+      Urls.updateTaskStatus(widget.task!.sId!, e),
+    );
+    if (response.isSuccess) {
+      widget.getTaskList();
+    } else {
+      showSnackBarMessage(context, response.errorMessage, true);
+    }
+  }
+
+  Future<void> _onPressedDeleteButton() async{
+    NetworkResponse response = await NetworkCaller.getRequest(
+      Urls.deleteTask(widget.task!.sId!),
+    );
+    if (response.isSuccess) {
+      widget.getTaskList();
+    } else {
+      showSnackBarMessage(context, response.errorMessage, true);
+    }
   }
 }

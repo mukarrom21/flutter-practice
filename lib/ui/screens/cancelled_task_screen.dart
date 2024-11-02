@@ -29,7 +29,6 @@ class _CancelledTaskScreenState extends State<CancelledTaskScreen> {
       final TaskListModel taskListModel =
       TaskListModel.fromJson(response.responseData);
       _cancelledTaskList = taskListModel.taskList ?? [];
-      showSnackBarMessage(context, "Cancelled task retrieved successfully");
     } else {
       showSnackBarMessage(context, response.errorMessage, true);
     }
@@ -54,7 +53,7 @@ class _CancelledTaskScreenState extends State<CancelledTaskScreen> {
         child: ListView.separated(
           itemCount: _cancelledTaskList.length,
           itemBuilder: (context, index) {
-            return TaskCard(task: _cancelledTaskList[index],);
+            return TaskCard(task: _cancelledTaskList[index], getTaskList: _getCancelledTasks,);
           }, separatorBuilder: (BuildContext context, int index) {
             return const SizedBox(
               height: 8,
