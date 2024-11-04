@@ -22,29 +22,33 @@ class AppBarHeader extends StatelessWidget implements PreferredSizeWidget {
       },
       child: AppBar(
         backgroundColor: AppColors.themeColor,
-        title: const Row(
+        title:  Row(
           children: [
-            CircleAvatar(
+            const CircleAvatar(
               radius: 25,
-              backgroundColor: Colors.white, // child: Container,
+              backgroundColor: Colors.white,
+              child: Icon(
+                Icons.person,
+                color: AppColors.themeColor,
+              ),
             ),
-            SizedBox(
+            const SizedBox(
               width: 10,
             ),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Rabbil Hasan',
-                  style: TextStyle(
+                  '${AuthController.userData?.firstName} ${AuthController.userData?.lastName}',
+                  style: const TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
                     fontSize: 18,
                   ),
                 ),
                 Text(
-                  'example@gmail.com',
-                  style: TextStyle(
+                  '${AuthController.userData?.email}',
+                  style: const TextStyle(
                     color: Colors.white,
                     fontSize: 14,
                   ),

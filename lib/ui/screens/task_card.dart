@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:practice_with_ostad/data/models/network_response.dart';
 import 'package:practice_with_ostad/data/models/task_model.dart';
+import 'package:practice_with_ostad/ui/widgets/center_circuler_progress_indicator.dart';
 import 'package:practice_with_ostad/ui/widgets/snack_bar_message.dart';
 
 import '../../data/services/network_caller.dart';
@@ -18,6 +19,9 @@ class TaskCard extends StatefulWidget {
 }
 
 class _TaskCardState extends State<TaskCard> {
+  bool _changeStatusInProgress = false;
+  bool _deleteInProgress = false;
+
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -46,20 +50,28 @@ class _TaskCardState extends State<TaskCard> {
                   const Spacer(),
 
                   /// Edit Button
-                  IconButton(
-                    onPressed: _onPressedEditButton,
-                    icon: const Icon(
-                      Icons.edit,
-                      color: AppColors.themeColor,
+                  Visibility(
+                    visible: _changeStatusInProgress == false,
+                    replacement: const CenterCircularProgressIndicator(),
+                    child: IconButton(
+                      onPressed: _onPressedEditButton,
+                      icon: const Icon(
+                        Icons.edit,
+                        color: AppColors.themeColor,
+                      ),
                     ),
                   ),
 
                   /// Delete Button
-                  IconButton(
-                    onPressed: _onPressedDeleteButton,
-                    icon: const Icon(
-                      Icons.delete,
-                      color: Colors.red,
+                  Visibility(
+                    visible: _deleteInProgress == false,
+                    replacement: const CenterCircularProgressIndicator(),
+                    child: IconButton(
+                      onPressed: _onPressedDeleteButton,
+                      icon: const Icon(
+                        Icons.delete,
+                        color: Colors.red,
+                      ),
                     ),
                   ),
                 ],
@@ -123,17 +135,29 @@ class _TaskCardState extends State<TaskCard> {
   }
 
   Future<void> _onTapChangeStatus(String e) async {
+    setState(() {
+      _changeStatusInProgress = true;
+    });
     NetworkResponse response = await NetworkCaller.getRequest(
       Urls.updateTaskStatus(widget.task!.sId!, e),
     );
     if (response.isSuccess) {
+      setState(() {
+        _changeStatusInProgress = false;
+      });
       widget.getTaskList();
     } else {
+      setState(() {
+        _changeStatusInProgress = false;
+      });
       showSnackBarMessage(context, response.errorMessage, true);
     }
   }
 
   Future<void> _onPressedDeleteButton() async{
+    setState(() {
+      _deleteInProgress = true;
+    });
     NetworkResponse response = await NetworkCaller.getRequest(
       Urls.deleteTask(widget.task!.sId!),
     );
@@ -142,5 +166,8 @@ class _TaskCardState extends State<TaskCard> {
     } else {
       showSnackBarMessage(context, response.errorMessage, true);
     }
+    setState(() {
+      _deleteInProgress = false;
+    });
   }
 }

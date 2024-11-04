@@ -1,5 +1,15 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:practice_with_ostad/data/models/network_response.dart';
+import 'package:practice_with_ostad/data/models/user_model.dart';
+import 'package:practice_with_ostad/data/services/network_caller.dart';
+import 'package:practice_with_ostad/data/utils/urls.dart';
+import 'package:practice_with_ostad/ui/controller/auth_controller.dart';
 import 'package:practice_with_ostad/ui/widgets/app_bar_header.dart';
+import 'package:practice_with_ostad/ui/widgets/center_circuler_progress_indicator.dart';
+import 'package:practice_with_ostad/ui/widgets/snack_bar_message.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -9,6 +19,23 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  XFile? _imageFile;
+  final TextEditingController _emailTEController = TextEditingController(
+    text: AuthController.userData?.email,
+  );
+  final TextEditingController _firstNameTEController = TextEditingController(
+    text: AuthController.userData?.firstName,
+  );
+  final TextEditingController _lastNameTEController = TextEditingController(
+    text: AuthController.userData?.lastName,
+  );
+  final TextEditingController _mobileTEController = TextEditingController(
+    text: AuthController.userData?.mobile,
+  );
+  final TextEditingController _passwordTEController = TextEditingController();
+  bool _isLoading = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -17,107 +44,228 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 48),
-            Text(
-              'Profile Screen',
-              style: Theme.of(context).textTheme.headlineLarge,
+        child: SingleChildScrollView(
+          child: _buildForm(context),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildForm(BuildContext context) {
+    return Form(
+      key: _formKey,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SizedBox(height: 48),
+          Text(
+            'Profile Screen',
+            style: Theme.of(context).textTheme.headlineLarge,
+          ),
+          const SizedBox(
+            height: 24,
+          ),
+          _buildAddPhoto(),
+          const SizedBox(
+            height: 8,
+          ),
+          TextFormField(
+            keyboardType: TextInputType.emailAddress,
+            controller: _emailTEController,
+            enabled: false,
+            decoration: const InputDecoration(
+              hintText: 'Email',
             ),
-            const SizedBox(
-              height: 24,
+            validator: (String? value) {
+              if (value?.trim().isEmpty ?? true) {
+                return 'Please enter your valid email address';
+              }
+              return null;
+            },
+          ),
+          const SizedBox(
+            height: 8,
+          ),
+          TextFormField(
+            keyboardType: TextInputType.text,
+            controller: _firstNameTEController,
+            decoration: const InputDecoration(
+              hintText: 'First Name',
             ),
-            _buildAddPhoto(),
-            const SizedBox(
-              height: 8,
+            validator: (String? value) {
+              if (value?.trim().isEmpty ?? true) {
+                return 'Please enter your first name';
+              }
+              return null;
+            },
+          ),
+          const SizedBox(
+            height: 8,
+          ),
+          TextFormField(
+            keyboardType: TextInputType.text,
+            controller: _lastNameTEController,
+            decoration: const InputDecoration(
+              hintText: 'Last Name',
             ),
-            TextFormField(
-              keyboardType: TextInputType.emailAddress,
-              decoration: const InputDecoration(
-                hintText: 'Email',
-              ),
+          ),
+          const SizedBox(
+            height: 8,
+          ),
+          TextFormField(
+            keyboardType: TextInputType.phone,
+            controller: _mobileTEController,
+            decoration: const InputDecoration(
+              hintText: 'Mobile',
             ),
-            const SizedBox(
-              height: 8,
+            validator: (String? value) {
+              if (value?.trim().isEmpty ?? true) {
+                return 'Please enter your mobile number';
+              }
+              return null;
+            },
+          ),
+          const SizedBox(
+            height: 8,
+          ),
+          TextFormField(
+            obscureText: true,
+            controller: _passwordTEController,
+            decoration: const InputDecoration(
+              hintText: 'Password',
             ),
-            TextFormField(
-              keyboardType: TextInputType.text,
-              decoration: const InputDecoration(
-                hintText: 'First Name',
-              ),
-            ),
-            const SizedBox(
-              height: 8,
-            ),
-            TextFormField(
-              keyboardType: TextInputType.text,
-              decoration: const InputDecoration(
-                hintText: 'Last Name',
-              ),
-            ),
-            const SizedBox(
-              height: 8,
-            ),
-            TextFormField(
-              keyboardType: TextInputType.phone,
-              decoration: const InputDecoration(
-                hintText: 'Mobile',
-              ),
-            ),
-            const SizedBox(
-              height: 8,
-            ),
-            TextFormField(
-              obscureText: true,
-              decoration: const InputDecoration(
-                hintText: 'Password',
-              ),
-            ),
-            const SizedBox(
-              height: 8,
-            ),
-            ElevatedButton(
-              onPressed: () {},
+          ),
+          const SizedBox(
+            height: 8,
+          ),
+          Visibility(
+            visible: _isLoading == false,
+            replacement: const CenterCircularProgressIndicator(),
+            child: ElevatedButton(
+              onPressed: () {
+                if (_formKey.currentState!.validate()) {
+                  _updateProfile();
+                }
+              },
               child: const Icon(Icons.arrow_circle_right_outlined),
             ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAddPhoto() {
+    return GestureDetector(
+      onTap: _pickImage,
+      child: Container(
+        height: 50,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(8),
+          color: Colors.white,
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 100,
+              height: 50,
+              decoration: const BoxDecoration(
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(8),
+                  bottomLeft: Radius.circular(8),
+                ),
+                color: Colors.grey,
+              ),
+              child: Center(
+                child: Text(
+                  _imageFile != null ? 'Change' : 'Add',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+            if (_imageFile != null)
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 8.0),
+                  child: Text(
+                    _imageFile!.name,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ),
           ],
         ),
       ),
     );
   }
 
-  Container _buildAddPhoto() {
-    return Container(
-            height: 50,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8),
-              color: Colors.white,
-            ),
-            child: Row(
-              children: [
-                Container(
-                  width: 100,
-                  height: 50,
-                  decoration: const BoxDecoration(
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(8),
-                      bottomLeft: Radius.circular(8),
-                    ),
-                    color: Colors.grey,
-                  ),
-                  child: const Center(
-                    child: Text(
-                      'Photo',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          );
+  Future<void> _pickImage() async {
+    // Pick an image
+    final ImagePicker picker = ImagePicker();
+    final XFile? pickedImage =
+        await picker.pickImage(source: ImageSource.gallery);
+    if (pickedImage != null) {
+      setState(() {
+        _imageFile = pickedImage;
+      });
+    }
+  }
+
+  // update profile
+  Future<void> _updateProfile() async {
+    setState(() {
+      _isLoading = true;
+    });
+    // update data
+    Map<String, dynamic> requestBody = {
+      'email': _emailTEController.text.trim(),
+      'firstName': _firstNameTEController.text.trim(),
+      'lastName': _lastNameTEController.text.trim(),
+      'mobile': _mobileTEController.text.trim(),
+    };
+    // check if image is not null then add it
+    if (_imageFile != null) {
+      List<int> imageBytes = await _imageFile!.readAsBytes();
+      String encodedImage = base64Encode(imageBytes);
+      requestBody["photo"] = encodedImage;
+    }
+    // check if password is not null then add it
+    if (_passwordTEController.text.isNotEmpty) {
+      requestBody["password"] = _passwordTEController.text;
+    }
+    final NetworkResponse response = await NetworkCaller.postRequest(
+      url: Urls.updateProfile,
+      data: requestBody,
+    );
+    if (response.isSuccess) {
+      // save user data
+      UserModel userModel = UserModel.fromJson(requestBody);
+      await AuthController.saveUserData(userModel);
+      await AuthController.getUserData();
+      setState(() {
+        _isLoading = false;
+      });
+    } else {
+      // show error
+      showSnackBarMessage(context, response.errorMessage, true);
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  // dispose
+  @override
+  void dispose() {
+    _firstNameTEController.dispose();
+    _lastNameTEController.dispose();
+    _mobileTEController.dispose();
+    _emailTEController.dispose();
+    _passwordTEController.dispose();
+    super.dispose();
   }
 }

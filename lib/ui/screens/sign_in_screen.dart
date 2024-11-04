@@ -1,5 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:practice_with_ostad/data/models/login_model.dart';
 import 'package:practice_with_ostad/data/models/network_response.dart';
 import 'package:practice_with_ostad/data/services/network_caller.dart';
 import 'package:practice_with_ostad/data/utils/urls.dart';
@@ -167,10 +168,10 @@ class _SignInScreenState extends State<SignInScreen> {
       return;
     }
 
-    _signUp();
+    _login();
   }
 
-  Future<void> _signUp() async {
+  Future<void> _login() async {
     setState(() {
       _isLoading = true;
     });
@@ -190,8 +191,11 @@ class _SignInScreenState extends State<SignInScreen> {
     });
 
     if (response.isSuccess) {
+      /// save user data
+      LoginModel loginModel = LoginModel.fromJson(response.responseData);
       /// save access token
-      await AuthController.saveAccessToken(response.responseData['token']);
+      await AuthController.saveAccessToken(loginModel.token!);
+      await AuthController.saveUserData(loginModel.userData!);
 
       if (mounted) {
         Navigator.pushAndRemoveUntil(
