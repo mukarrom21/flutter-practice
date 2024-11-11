@@ -239,24 +239,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
       requestBody["password"] = _passwordTEController.text;
     }
 
-    final bool isSuccess =
-        await _updateProfileController.updateProfile(requestBody);
+    final bool isSuccess = await _updateProfileController.updateProfile(requestBody);
     if (isSuccess) {
-      Get.snackbar(
-        "Congratulations",
-        "Your profile has been updated successfully",
-        backgroundColor: Colors.green,
-        colorText: Colors.white,
-        snackPosition: SnackPosition.BOTTOM,
-      );
+      Get.back(closeOverlays: true, result: true);
     } else {
-      Get.snackbar(
-        "Error",
-        _updateProfileController.errorMessage,
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-        snackPosition: SnackPosition.BOTTOM,
-      );
+      Get.snackbar("Error", _updateProfileController.errorMessage);
     }
   }
 

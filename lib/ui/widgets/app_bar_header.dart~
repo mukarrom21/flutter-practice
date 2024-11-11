@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:tm_getx/ui/controller/auth_controller.dart';
@@ -27,50 +25,49 @@ class AppBarHeader extends StatelessWidget implements PreferredSizeWidget {
       },
       child: AppBar(
         backgroundColor: AppColors.themeColor,
-        title: GetBuilder<UpdateProfileController>(builder: (controller) {
-          return Visibility(
-            visible: !controller.isLoading,
-            replacement: const CenterCircularProgressIndicator(),
-            child: Row(
-              children: [
-                CircleAvatar(
-                  radius: 25,
-                  backgroundColor: Colors.white,
-                  child: AuthController.userData?.photo != null
-                      ? Image.memory(
-                          base64Decode(AuthController.userData!.photo!))
-                      : const Icon(
-                          Icons.person,
-                          color: AppColors.themeColor,
+        title:  GetBuilder<UpdateProfileController>(
+          builder: (controller) {
+            return Visibility(
+              visible: !controller.isLoading,
+              replacement: const CenterCircularProgressIndicator(),
+              child: Row(
+                children: [
+                  CircleAvatar(
+                    radius: 25,
+                    backgroundColor: Colors.white,
+                    child: Image?.memory((AuthController.userData?.photo)) ?? Icon(
+                      Icons.person,
+                      color: AppColors.themeColor,
+                    ),
+                  ),
+                  const SizedBox(
+                    width: 10,
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '${AuthController.userData?.firstName} ${AuthController.userData?.lastName}',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
                         ),
-                ),
-                const SizedBox(
-                  width: 10,
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      '${AuthController.userData?.firstName} ${AuthController.userData?.lastName}',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18,
                       ),
-                    ),
-                    Text(
-                      '${AuthController.userData?.email}',
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 14,
+                      Text(
+                        '${AuthController.userData?.email}',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 14,
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          );
-        }),
+                    ],
+                  ),
+                ],
+              ),
+            );
+          }
+        ),
         actions: [
           IconButton(
               onPressed: () async {
