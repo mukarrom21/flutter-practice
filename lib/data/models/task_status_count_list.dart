@@ -1,4 +1,4 @@
-import 'package:practice_with_ostad/data/models/task_status_count.dart';
+import 'package:tm_getx/data/models/task_status_count.dart';
 
 class TaskStatusCountList {
   String? status;

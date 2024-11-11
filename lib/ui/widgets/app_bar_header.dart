@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:practice_with_ostad/ui/controller/auth_controller.dart';
-import 'package:practice_with_ostad/ui/screens/profile_screen.dart';
-import 'package:practice_with_ostad/ui/screens/sign_in_screen.dart';
+import 'package:tm_getx/ui/controller/auth_controller.dart';
+import 'package:tm_getx/ui/screens/profile_screen.dart';
+import 'package:tm_getx/ui/screens/sign_in_screen.dart';
 import '../utils/app_colors.dart';
 
 class AppBarHeader extends StatelessWidget implements PreferredSizeWidget {

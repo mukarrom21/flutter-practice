@@ -1,18 +1,16 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:practice_with_ostad/data/models/login_model.dart';
-import 'package:practice_with_ostad/data/models/network_response.dart';
-import 'package:practice_with_ostad/data/services/network_caller.dart';
-import 'package:practice_with_ostad/data/utils/urls.dart';
-import 'package:practice_with_ostad/ui/controller/auth_controller.dart';
-import 'package:practice_with_ostad/ui/screens/main_screen.dart';
-import 'package:practice_with_ostad/ui/screens/signup_screen.dart';
-import 'package:practice_with_ostad/ui/screens/verify_email_screen.dart';
-import 'package:practice_with_ostad/ui/utils/app_colors.dart';
-import 'package:practice_with_ostad/ui/widgets/background_screen.dart';
-import 'package:practice_with_ostad/ui/widgets/snack_bar_message.dart';
+import 'package:get/get.dart';
+import 'package:tm_getx/ui/controller/login_controller.dart';
+import 'package:tm_getx/ui/screens/main_screen.dart';
+import 'package:tm_getx/ui/screens/signup_screen.dart';
+import 'package:tm_getx/ui/screens/verify_email_screen.dart';
+import 'package:tm_getx/ui/utils/app_colors.dart';
+import 'package:tm_getx/ui/widgets/background_screen.dart';
 
 class SignInScreen extends StatefulWidget {
+  static const String name = "/sign-in-screen";
+
   const SignInScreen({super.key});
 
   @override
@@ -23,7 +21,6 @@ class _SignInScreenState extends State<SignInScreen> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  bool _isLoading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -67,7 +64,6 @@ class _SignInScreenState extends State<SignInScreen> {
     );
   }
 
-  /// Build the sign in form
   Widget _buildSignInForm() {
     return Form(
       key: _formKey,
@@ -109,15 +105,19 @@ class _SignInScreenState extends State<SignInScreen> {
           const SizedBox(
             height: 24,
           ),
-          Visibility(
-            visible: !_isLoading,
-            replacement: const Center(
-              child: CircularProgressIndicator(),
-            ),
-            child: ElevatedButton(
-              onPressed: _onClickNextArrowButton,
-              child: const Icon(Icons.arrow_circle_right_outlined),
-            ),
+          GetBuilder<LoginController>(
+            builder: (controller) {
+              return Visibility(
+                visible: controller.isLoading == false,
+                replacement: const Center(
+                  child: CircularProgressIndicator(),
+                ),
+                child: ElevatedButton(
+                  onPressed: _onClickLoginButton,
+                  child: const Icon(Icons.arrow_circle_right_outlined),
+                ),
+              );
+            },
           ),
         ],
       ),
@@ -130,7 +130,7 @@ class _SignInScreenState extends State<SignInScreen> {
       child: Column(
         children: [
           TextButton(
-            onPressed: _onClickForgotPassword,
+            onPressed: () => Get.toNamed(VerifyEmailScreen.name),
             child: const Text(
               'Forgot Password?',
               style: TextStyle(
@@ -153,7 +153,7 @@ class _SignInScreenState extends State<SignInScreen> {
                     color: AppColors.themeColor,
                   ),
                   recognizer: TapGestureRecognizer()
-                    ..onTap = _onClickDontHaveAccountSignup,
+                    ..onTap = () => Get.toNamed(SignupScreen.name),
                 ),
               ],
             ),
@@ -163,7 +163,7 @@ class _SignInScreenState extends State<SignInScreen> {
     );
   }
 
-  void _onClickNextArrowButton() {
+  void _onClickLoginButton() {
     if (!_formKey.currentState!.validate()) {
       return;
     }
@@ -172,58 +172,21 @@ class _SignInScreenState extends State<SignInScreen> {
   }
 
   Future<void> _login() async {
-    setState(() {
-      _isLoading = true;
-    });
-
-    Map<String, dynamic> requestBody = {
-      "email": _emailController.text.trim(),
-      "password": _passwordController.text,
-    };
-
-    final NetworkResponse response = await NetworkCaller.postRequest(
-      url: Urls.login,
-      data: requestBody,
+    var isSuccess = await LoginController().login(
+      _emailController.text.trim(),
+      _passwordController.text,
     );
 
-    setState(() {
-      _isLoading = false;
-    });
-
-    if (response.isSuccess) {
-      /// save user data
-      LoginModel loginModel = LoginModel.fromJson(response.responseData);
-      /// save access token
-      await AuthController.saveAccessToken(loginModel.token!);
-      await AuthController.saveUserData(loginModel.userData!);
-
-      if (mounted) {
-        Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(builder: (context) => const MainScreen()),
-          (route) => false,
-        );
-        showSnackBarMessage(context, "Login completed successfully", false);
-      }
+    if (isSuccess) {
+      Get.offAllNamed(MainScreen.name);
     } else {
-      if (mounted) {
-        showSnackBarMessage(context, response.errorMessage, true);
-      }
+      Get.showSnackbar(const GetSnackBar(
+        message: "Login failed",
+        backgroundColor: Colors.red,
+        duration: Duration(seconds: 2),
+        snackPosition: SnackPosition.TOP,
+      ));
     }
-  }
-
-  void _onClickForgotPassword() {
-    Navigator.push(context,
-        MaterialPageRoute(builder: (context) => const VerifyEmailScreen()));
-  }
-
-  void _onClickDontHaveAccountSignup() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => const SignupScreen(),
-      ),
-    );
   }
 
   @override

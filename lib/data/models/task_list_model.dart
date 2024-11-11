@@ -1,4 +1,4 @@
-import 'package:practice_with_ostad/data/models/task_model.dart';
+import 'package:tm_getx/data/models/task_model.dart';
 
 class TaskListModel {
   String? status;

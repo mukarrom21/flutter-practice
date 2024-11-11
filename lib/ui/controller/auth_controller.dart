@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:practice_with_ostad/data/models/user_model.dart';
+import 'package:tm_getx/data/models/user_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthController {

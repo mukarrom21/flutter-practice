@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:tm_getx/data/models/network_response.dart';
-import 'package:tm_getx/data/models/task_model.dart';
-import 'package:tm_getx/ui/widgets/center_circuler_progress_indicator.dart';
-import 'package:tm_getx/ui/widgets/snack_bar_message.dart';
+import 'package:practice_with_ostad/data/models/network_response.dart';
+import 'package:practice_with_ostad/data/models/task_model.dart';
+import 'package:practice_with_ostad/ui/widgets/center_circuler_progress_indicator.dart';
+import 'package:practice_with_ostad/ui/widgets/snack_bar_message.dart';
 
 import '../../data/services/network_caller.dart';
 import '../../data/utils/urls.dart';

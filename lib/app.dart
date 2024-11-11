@@ -1,6 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:practice_with_ostad/ui/screens/splash_screen.dart';
-import 'package:practice_with_ostad/ui/utils/app_colors.dart';
+import 'package:get/get.dart';
+import 'package:tm_getx/controller_binder.dart';
+import 'package:tm_getx/ui/screens/main_screen.dart';
+import 'package:tm_getx/ui/screens/pin_verification_screen.dart';
+import 'package:tm_getx/ui/screens/reset_password_screen.dart';
+import 'package:tm_getx/ui/screens/sign_in_screen.dart';
+import 'package:tm_getx/ui/screens/signup_screen.dart';
+import 'package:tm_getx/ui/screens/splash_screen.dart';
+import 'package:tm_getx/ui/screens/verify_email_screen.dart';
+import 'package:tm_getx/ui/utils/app_colors.dart';
 
 class TaskManagerApp extends StatefulWidget {
   const TaskManagerApp({super.key});
@@ -12,16 +20,28 @@ class TaskManagerApp extends StatefulWidget {
 }
 
 class _TaskManagerAppState extends State<TaskManagerApp> {
+  Map<String, Widget Function(BuildContext)> routes = {
+    SplashScreen.name : (context) => const SplashScreen(),
+    MainScreen.name : (context) => const MainScreen(),
+    SignInScreen.name : (context) => const SignInScreen(),
+    SignupScreen.name : (context) => const SignupScreen(),
+    VerifyEmailScreen.name: (context) => const VerifyEmailScreen(),
+    PinVerificationScreen.name : (context) => const PinVerificationScreen(),
+    ResetPasswordScreen.name: (context) => const ResetPasswordScreen(),
+  };
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return GetMaterialApp(
       navigatorKey: TaskManagerApp.navigationKey,
-      debugShowCheckedModeBanner: false,
+      // debugShowCheckedModeBanner: false,
       theme: ThemeData(
-          colorSchemeSeed: AppColors.themeColor,
-          inputDecorationTheme: _inputDecorationTheme(),
-          elevatedButtonTheme: _elevatedButtonThemeData()),
-      home: const SplashScreen(),
+        colorSchemeSeed: AppColors.themeColor,
+        inputDecorationTheme: _inputDecorationTheme(),
+        elevatedButtonTheme: _elevatedButtonThemeData(),
+      ),
+      initialBinding: ControllerBinder(),
+      initialRoute: SplashScreen.name,
+      routes: routes,
     );
   }
 

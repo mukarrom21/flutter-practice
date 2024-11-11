@@ -1,4 +1,4 @@
-import 'package:practice_with_ostad/data/models/user_model.dart';
+import 'package:tm_getx/data/models/user_model.dart';
 
 class LoginModel {
   String? status;

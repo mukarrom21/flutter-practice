@@ -2,10 +2,10 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
-import 'package:practice_with_ostad/app.dart';
-import 'package:practice_with_ostad/data/models/network_response.dart';
-import 'package:practice_with_ostad/ui/controller/auth_controller.dart';
-import 'package:practice_with_ostad/ui/screens/sign_in_screen.dart';
+import 'package:tm_getx/app.dart';
+import 'package:tm_getx/data/models/network_response.dart';
+import 'package:tm_getx/ui/controller/auth_controller.dart';
+import 'package:tm_getx/ui/screens/sign_in_screen.dart';
 
 class NetworkCaller {
   /// HTTP Get Request

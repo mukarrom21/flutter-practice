@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:practice_with_ostad/ui/utils/assets_path.dart';
+import 'package:tm_getx/ui/utils/assets_path.dart';
 
 class BackgroundScreen extends StatelessWidget {
   const BackgroundScreen({

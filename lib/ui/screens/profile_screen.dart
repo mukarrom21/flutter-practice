@@ -2,14 +2,14 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:practice_with_ostad/data/models/network_response.dart';
-import 'package:practice_with_ostad/data/models/user_model.dart';
-import 'package:practice_with_ostad/data/services/network_caller.dart';
-import 'package:practice_with_ostad/data/utils/urls.dart';
-import 'package:practice_with_ostad/ui/controller/auth_controller.dart';
-import 'package:practice_with_ostad/ui/widgets/app_bar_header.dart';
-import 'package:practice_with_ostad/ui/widgets/center_circuler_progress_indicator.dart';
-import 'package:practice_with_ostad/ui/widgets/snack_bar_message.dart';
+import 'package:tm_getx/data/models/network_response.dart';
+import 'package:tm_getx/data/models/user_model.dart';
+import 'package:tm_getx/data/services/network_caller.dart';
+import 'package:tm_getx/data/utils/urls.dart';
+import 'package:tm_getx/ui/controller/auth_controller.dart';
+import 'package:tm_getx/ui/widgets/app_bar_header.dart';
+import 'package:tm_getx/ui/widgets/center_circuler_progress_indicator.dart';
+import 'package:tm_getx/ui/widgets/snack_bar_message.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});

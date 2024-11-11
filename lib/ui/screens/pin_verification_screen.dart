@@ -1,12 +1,18 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
-import 'package:practice_with_ostad/ui/screens/reset_password_screen.dart';
-import 'package:practice_with_ostad/ui/screens/sign_in_screen.dart';
-import 'package:practice_with_ostad/ui/utils/app_colors.dart';
-import 'package:practice_with_ostad/ui/widgets/background_screen.dart';
+import 'package:tm_getx/data/models/network_response.dart';
+import 'package:tm_getx/ui/controller/verify_otp_controller.dart';
+import 'package:tm_getx/ui/screens/reset_password_screen.dart';
+import 'package:tm_getx/ui/screens/sign_in_screen.dart';
+import 'package:tm_getx/ui/utils/app_colors.dart';
+import 'package:tm_getx/ui/widgets/background_screen.dart';
+import 'package:tm_getx/ui/widgets/center_circuler_progress_indicator.dart';
 
 class PinVerificationScreen extends StatefulWidget {
+  static const String name = 'PinVerificationScreen';
+
   const PinVerificationScreen({super.key});
 
   @override
@@ -14,6 +20,10 @@ class PinVerificationScreen extends StatefulWidget {
 }
 
 class _PinVerificationScreenState extends State<PinVerificationScreen> {
+  final VerifyOtpController _verifyOtpController = Get.find();
+  final String _email = Get.arguments;
+  String? _pinCode;
+
   @override
   Widget build(BuildContext context) {
     final TextTheme textTheme = Theme.of(context).textTheme;
@@ -48,7 +58,7 @@ class _PinVerificationScreenState extends State<PinVerificationScreen> {
               ),
 
               /// Sign in form
-              _buildSignInForm(),
+              _buildPinVerificationForm(),
 
               const SizedBox(
                 height: 28,
@@ -64,7 +74,7 @@ class _PinVerificationScreenState extends State<PinVerificationScreen> {
   }
 
   /// Build the sign in form
-  Widget _buildSignInForm() {
+  Widget _buildPinVerificationForm() {
     return Form(
       child: Column(
         children: [
@@ -93,7 +103,8 @@ class _PinVerificationScreenState extends State<PinVerificationScreen> {
             // errorAnimationController: errorController,
             // controller: textEditingController,
             onCompleted: (v) {
-              print("Completed");
+              _pinCode = v;
+              setState(() {});
             },
             // onChanged: (value) {
             //   print(value);
@@ -112,10 +123,22 @@ class _PinVerificationScreenState extends State<PinVerificationScreen> {
           const SizedBox(
             height: 24,
           ),
-          ElevatedButton(
-            onPressed: _onClickVerifyButton,
-            child: const Text("Verify"),
-          ),
+          GetBuilder<VerifyOtpController>(builder: (controller) {
+            return Visibility(
+              visible: !controller.isLoading,
+              replacement: const CenterCircularProgressIndicator(),
+              child: ElevatedButton(
+                statesController: WidgetStatesController(),
+                onPressed: () {
+                  if (_pinCode != null && _pinCode!.length == 6) {
+                    _onClickVerifyButton();
+                  }
+                  return;
+                },
+                child: const Text("Verify"),
+              ),
+            );
+          }),
         ],
       ),
     );
@@ -138,7 +161,8 @@ class _PinVerificationScreenState extends State<PinVerificationScreen> {
               style: textTheme.bodyLarge?.copyWith(
                 color: AppColors.themeColor,
               ),
-              recognizer: TapGestureRecognizer()..onTap = _onClickHaveAccountSignIn,
+              recognizer: TapGestureRecognizer()
+                ..onTap = _onClickHaveAccountSignIn,
             ),
           ],
         ),
@@ -146,13 +170,15 @@ class _PinVerificationScreenState extends State<PinVerificationScreen> {
     );
   }
 
-  void _onClickVerifyButton() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => const ResetPasswordScreen(),
-      ),
-    );
+  void _onClickVerifyButton() async {
+    final bool isSuccess =
+        await _verifyOtpController.verifyOtp(_email, _pinCode!);
+    if (isSuccess) {
+      Get.snackbar("Success", _verifyOtpController.data ?? "");
+      Get.toNamed(ResetPasswordScreen.name, arguments: [_email, _pinCode!]);
+    } else {
+      Get.snackbar("Error", _verifyOtpController.errorMessage ?? "");
+    }
   }
 
   void _onClickHaveAccountSignIn() {

@@ -1,16 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:practice_with_ostad/data/models/network_response.dart';
-import 'package:practice_with_ostad/data/models/task_list_model.dart';
-import 'package:practice_with_ostad/data/models/task_model.dart';
-import 'package:practice_with_ostad/data/models/task_status_count.dart';
-import 'package:practice_with_ostad/data/models/task_status_count_list.dart';
-import 'package:practice_with_ostad/data/services/network_caller.dart';
-import 'package:practice_with_ostad/data/utils/urls.dart';
-import 'package:practice_with_ostad/ui/screens/add_new_task.dart';
-import 'package:practice_with_ostad/ui/screens/task_card.dart';
-import 'package:practice_with_ostad/ui/screens/task_summary_card.dart';
-import 'package:practice_with_ostad/ui/widgets/center_circuler_progress_indicator.dart';
-import 'package:practice_with_ostad/ui/widgets/snack_bar_message.dart';
+import 'package:get/get.dart';
+import 'package:tm_getx/data/utils/urls.dart';
+import 'package:tm_getx/ui/controller/task_list_controller.dart';
+import 'package:tm_getx/ui/controller/task_summary_controller.dart';
+import 'package:tm_getx/ui/screens/add_new_task.dart';
+import 'package:tm_getx/ui/screens/task_card.dart';
+import 'package:tm_getx/ui/screens/task_summary_card.dart';
+import 'package:tm_getx/ui/widgets/center_circuler_progress_indicator.dart';
 
 class NewTaskScreen extends StatefulWidget {
   const NewTaskScreen({super.key});
@@ -20,42 +16,8 @@ class NewTaskScreen extends StatefulWidget {
 }
 
 class _NewTaskScreenState extends State<NewTaskScreen> {
-  List<TaskModel> _newTaskList = [];
-  List<TaskStatusCount> _taskStatusCountList = [];
-  bool _getNewTaskInProgress = false;
-
-  Future<void> _getNewTasksList() async {
-    _newTaskList.clear();
-    _getNewTaskInProgress = true;
-    setState(() {});
-    final NetworkResponse response =
-        await NetworkCaller.getRequest(Urls.getNewTasks);
-    if (response.isSuccess) {
-      final TaskListModel taskListModel =
-          TaskListModel.fromJson(response.responseData);
-      _newTaskList = taskListModel.taskList ?? [];
-      // showSnackBarMessage(context, "New task retrieved successfully");
-    } else {
-      showSnackBarMessage(context, response.errorMessage, true);
-    }
-    _getNewTaskInProgress = false;
-    setState(() {});
-  }
-
-  Future<void> _getTaskSummary() async {
-    final NetworkResponse response =
-        await NetworkCaller.getRequest(Urls.taskStatusCount);
-    if (response.isSuccess) {
-      final TaskStatusCountList taskStatusCountList =
-          TaskStatusCountList.fromJson(response.responseData);
-      _taskStatusCountList = taskStatusCountList.taskStatusCountList ?? [];
-      // showSnackBarMessage(context, "New task retrieved successfully");
-    } else {
-      showSnackBarMessage(context, response.errorMessage, true);
-    }
-    _getNewTaskInProgress = false;
-    setState(() {});
-  }
+  final TaskListController taskListController = Get.find();
+  final TaskSummaryController taskSummaryController = Get.find();
 
   @override
   void initState() {
@@ -74,50 +36,57 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
       body: RefreshIndicator(
         onRefresh: () async {
           _getNewTasksList();
+          _getTaskSummary();
         },
         child: Padding(
           padding: const EdgeInsets.all(8.0),
-          child: Visibility(
-            visible: !_getNewTaskInProgress,
-            replacement: const CenterCircularProgressIndicator(),
-            child: Column(
-              children: [
-                _taskSummary(),
-                const SizedBox(
-                  height: 8,
-                ),
-                Expanded(
-                  child: ListView.separated(
-                    itemCount: _newTaskList.length,
-                    itemBuilder: (context, index) {
-                      return TaskCard(
-                        task: _newTaskList[index],
-                        getTaskList: _getNewTasksList,
-                      );
-                    },
-                    separatorBuilder: (BuildContext context, int index) {
-                      return const SizedBox(
-                        height: 8,
-                      );
-                    },
+          child: GetBuilder<TaskListController>(builder: (controller){
+            return Visibility(
+              visible: !controller.isLoading,
+              replacement: const CenterCircularProgressIndicator(),
+              child: Column(
+                children: [
+                  _taskSummary(),
+                  const SizedBox(
+                    height: 8,
                   ),
-                ),
-              ],
-            ),
-          ),
+                  Expanded(
+                    child: ListView.separated(
+                      itemCount: controller.taskList.length,
+                      itemBuilder: (context, index) {
+                        return TaskCard(
+                          task: controller.taskList[index],
+                          getTaskList: (){
+                            _getNewTasksList();
+                            _getTaskSummary();
+                          },
+                        );
+                      },
+                      separatorBuilder: (BuildContext context, int index) {
+                        return const SizedBox(
+                          height: 8,
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            );
+          }),
         ),
       ),
     );
   }
 
   Widget _taskSummary() {
-    return Visibility(
-      visible: _getNewTaskInProgress == false,
+    return GetBuilder<TaskSummaryController>(builder: (controller){
+      return Visibility(
+      visible: controller.isLoading == false,
       replacement: const CenterCircularProgressIndicator(),
       child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
         child: Row(
-          children: _taskStatusCountList
+          children: controller.taskStatusCountList
               .map(
                 (e) => TaskSummaryCard(
                   title: e.sId ?? "",
@@ -128,6 +97,29 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
         ),
       ),
     );
+    });
+  }
+
+  Future<void> _getTaskSummary() async {
+    bool isSuccess = await taskSummaryController.getTaskSummary();
+    if (!isSuccess) {
+      Get.showSnackbar(
+          GetSnackBar(
+            message: taskSummaryController.errorMessage,
+            duration: const Duration(seconds: 2),
+            backgroundColor: Colors.red,
+          )
+      );
+    }
+  }
+
+  Future<void> _getNewTasksList() async {
+    bool isSuccess = await taskListController.getTasksList(Urls.getNewTasks);
+    if (!isSuccess) {
+      Get.showSnackbar(GetSnackBar(
+        message: taskListController.errorMessage,
+      ));
+    }
   }
 
   /// On Pressed FAB

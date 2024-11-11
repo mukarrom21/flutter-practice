@@ -1,14 +1,13 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:practice_with_ostad/data/models/network_response.dart';
-import 'package:practice_with_ostad/data/services/network_caller.dart';
-import 'package:practice_with_ostad/ui/utils/app_colors.dart';
-import 'package:practice_with_ostad/ui/widgets/background_screen.dart';
-import 'package:practice_with_ostad/ui/widgets/snack_bar_message.dart';
-
-import '../../data/utils/urls.dart';
+import 'package:get/get.dart';
+import 'package:tm_getx/ui/controller/sign_up_controller.dart';
+import 'package:tm_getx/ui/utils/app_colors.dart';
+import 'package:tm_getx/ui/widgets/background_screen.dart';
 
 class SignupScreen extends StatefulWidget {
+  static const String name = '/signup-screen';
+
   const SignupScreen({super.key});
 
   @override
@@ -16,15 +15,14 @@ class SignupScreen extends StatefulWidget {
 }
 
 class _SignupScreenState extends State<SignupScreen> {
+  final SignUpController signUpController = Get.find();
+
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final TextEditingController _emailTEController = TextEditingController();
   final TextEditingController _firstNameTEController = TextEditingController();
   final TextEditingController _lastNameTEController = TextEditingController();
   final TextEditingController _mobileTEController = TextEditingController();
   final TextEditingController _passwordTEController = TextEditingController();
-  bool isLoading = false;
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -175,16 +173,18 @@ class _SignupScreenState extends State<SignupScreen> {
           // const CircularProgressIndicator(),
 
           /// save button
-          Visibility(
-            visible: !isLoading,
-            replacement: const Center(
-              child: CircularProgressIndicator(),
-            ),
-            child: ElevatedButton(
-              onPressed: _onClickNextArrow,
-              child: const Icon(Icons.arrow_circle_right_outlined),
-            ),
-          ),
+          GetBuilder<SignUpController>(builder: (controller) {
+            return Visibility(
+              visible: !controller.isLoading,
+              replacement: const Center(
+                child: CircularProgressIndicator(),
+              ),
+              child: ElevatedButton(
+                onPressed: _onClickNextArrowSignUpButton,
+                child: const Icon(Icons.arrow_circle_right_outlined),
+              ),
+            );
+          }),
         ],
       ),
     );
@@ -220,18 +220,13 @@ class _SignupScreenState extends State<SignupScreen> {
     );
   }
 
-  void _onClickNextArrow() {
+  void _onClickNextArrowSignUpButton() {
     if (_formKey.currentState!.validate()) {
       _signUp();
     }
   }
 
-
   Future<void> _signUp() async {
-    setState(() {
-      isLoading = true;
-    });
-
     Map<String, dynamic> requestData = {
       "email": _emailTEController.text.trim(),
       "firstName": _firstNameTEController.text.trim(),
@@ -240,39 +235,25 @@ class _SignupScreenState extends State<SignupScreen> {
       "password": _passwordTEController.text,
     };
 
-    // print(requestData);
-
-    NetworkResponse response = await NetworkCaller.postRequest(
-      url: Urls.register,
-      data: requestData,
-    );
-
-    if (mounted) {
-      if (response.isSuccess) {
-        showSnackBarMessage(context, "Signup completed successfully");
-        _clearTextFields();
-      } else {
-        showSnackBarMessage(context, "Signup failed", true);
-      }
-      isLoading = false;
-      setState(() {});
-
-      Navigator.pop(context);
+    bool isSuccess = await signUpController.signUp(requestData);
+    if (isSuccess) {
+      Get.back();
+      Get.showSnackbar(const GetSnackBar(
+        message: "Signup completed successfully. Please login.",
+        duration: Duration(seconds: 3),
+        backgroundColor: Colors.green,
+      ));
+    } else {
+      Get.showSnackbar(const GetSnackBar(
+        message: "Signup failed",
+        duration: Duration(seconds: 3),
+        backgroundColor: Colors.red,
+        snackPosition: SnackPosition.TOP,
+      ));
     }
   }
 
-  /// Clear the text fields
-  void _clearTextFields() {
-    _firstNameTEController.clear();
-    _lastNameTEController.clear();
-    _mobileTEController.clear();
-    _emailTEController.clear();
-    _passwordTEController.clear();
-  }
-
-  void _onClickHaveAccountSignIn() {
-    Navigator.pop(context);
-  }
+  void _onClickHaveAccountSignIn() => Get.back();
 
   @override
   void dispose() {
