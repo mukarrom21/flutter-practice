@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:tm_getx/ui/controller/auth_controller.dart';
 import 'package:tm_getx/ui/controller/update_profile_controller.dart';
-import 'package:tm_getx/ui/screens/profile_screen.dart';
+import 'package:tm_getx/ui/screens/update_profile_screen.dart';
 import 'package:tm_getx/ui/screens/sign_in_screen.dart';
 import 'package:tm_getx/ui/widgets/center_circuler_progress_indicator.dart';
 import '../utils/app_colors.dart';
@@ -22,8 +22,10 @@ class AppBarHeader extends StatelessWidget implements PreferredSizeWidget {
     return GestureDetector(
       onTap: () {
         if (isProfileScreen) return;
-        Navigator.push(context,
-            MaterialPageRoute(builder: (context) => const ProfileScreen()));
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => const UpdateProfileScreen()));
       },
       child: AppBar(
         backgroundColor: AppColors.themeColor,
@@ -37,8 +39,14 @@ class AppBarHeader extends StatelessWidget implements PreferredSizeWidget {
                   radius: 25,
                   backgroundColor: Colors.white,
                   child: AuthController.userData?.photo != null
-                      ? Image.memory(
-                          base64Decode(AuthController.userData!.photo!))
+                      ? ClipOval(
+                        child: Image.memory(
+                            base64Decode(AuthController.userData!.photo!),
+                            fit: BoxFit.cover,
+                            width: 50,
+                            height: 50,
+                          ),
+                      )
                       : const Icon(
                           Icons.person,
                           color: AppColors.themeColor,

@@ -1,8 +1,10 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:tm_getx/data/models/network_response.dart';
 import 'package:tm_getx/data/models/user_model.dart';
 import 'package:tm_getx/data/services/network_caller.dart';
@@ -13,17 +15,18 @@ import 'package:tm_getx/ui/widgets/app_bar_header.dart';
 import 'package:tm_getx/ui/widgets/center_circuler_progress_indicator.dart';
 import 'package:tm_getx/ui/widgets/snack_bar_message.dart';
 
-class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({super.key});
+class UpdateProfileScreen extends StatefulWidget {
+  const UpdateProfileScreen({super.key});
 
   @override
-  State<ProfileScreen> createState() => _ProfileScreenState();
+  State<UpdateProfileScreen> createState() => _UpdateProfileScreenState();
 }
 
-class _ProfileScreenState extends State<ProfileScreen> {
+class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
   final UpdateProfileController _updateProfileController = Get.find();
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
   XFile? _imageFile;
   final TextEditingController _emailTEController = TextEditingController(
     text: AuthController.userData?.email,
@@ -38,6 +41,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
     text: AuthController.userData?.mobile,
   );
   final TextEditingController _passwordTEController = TextEditingController();
+
+  @override
+  void initState() {
+    if(AuthController.userData?.photo != null){
+      _setImageFromBase64(AuthController.userData!.photo!);
+    }
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -269,5 +280,23 @@ class _ProfileScreenState extends State<ProfileScreen> {
     _emailTEController.dispose();
     _passwordTEController.dispose();
     super.dispose();
+  }
+
+  Future<void> _setImageFromBase64(String base64String) async{
+    // Decode the Base64 string into bytes
+    List<int> imageBytes = base64Decode(base64String);
+
+    // Get the temporary directory for saving the image
+    final Directory tempDir = await getTemporaryDirectory();
+    final String filePath = '${tempDir.path}/profile_image.png';
+
+    // Write the bytes to a file
+    File imageFile = File(filePath);
+    await imageFile.writeAsBytes(imageBytes);
+
+    // Create an XFile from file path
+    setState(() {
+      _imageFile = XFile(filePath);
+    });
   }
 }
